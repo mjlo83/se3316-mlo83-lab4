@@ -15,6 +15,19 @@ export const divLoginError = document.querySelector('#divLoginError')
 export const lblLoginErrorMessage = document.querySelector('#lblLoginErrorMessage')
 export const btnDeleteAccount = document.querySelector('#btnDeleteAccount');
 
+export const newPassword = document.querySelector('#newPassword');
+export const btnChangePassword = document.querySelector('#btnChangePassword');
+
+export const showPasswordChangeForm = () => {
+  const passwordChangeForm = document.querySelector('#passwordChangeForm');
+  passwordChangeForm.style.display = 'block'; // Assuming you want to show this form only when necessary
+}
+
+export const hidePasswordChangeForm = () => {
+  const passwordChangeForm = document.querySelector('#passwordChangeForm');
+  passwordChangeForm.style.display = 'none';
+}
+
 export const showDeleteConfirmation = (callback) => {
   const confirmation = window.confirm("Are you sure you want to delete your account? This cannot be undone.");
   if (confirmation) {

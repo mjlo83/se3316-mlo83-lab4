@@ -8,8 +8,11 @@ import {
   btnLogin,
   btnSignup,
   btnLogout,
-  showDeleteConfirmation
-  
+  showDeleteConfirmation,
+  newPassword,
+  btnChangePassword,
+  showPasswordChangeForm,
+  hidePasswordChangeForm
 } from './ui'
 
 import { initializeApp } from 'firebase/app';
@@ -25,9 +28,13 @@ import {
   signInWithEmailAndPassword,
   connectAuthEmulator,
   deleteUser,
+  updatePassword,
   
   //sendEmailVerification
 } from 'firebase/auth';
+
+
+
 
 
 
@@ -51,23 +58,38 @@ const loginEmailPassword = async () => {
   //await signInWithEmailAndPassword(auth, loginEmail, loginPassword)
 
   // step 2: add error handling
-    try {
-      await signInWithEmailAndPassword(auth, loginEmail, loginPassword)
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+    if (userCredential.user.emailVerified) {
       console.log(userCredential.user);
+      // Proceed with the login
+    } else {
+      console.log(userCredential.user);
+      //alert("Please verify your email first!");
+      //await signOut(auth); // Optional: sign out the user if email is not verified
     }
-    catch(error) {
-      console.log(`There was an error: ${error}`)
-      showLoginError(error)
-    }
+  } catch (error) {
+    console.log(`There was an error: ${error}`);
+    showLoginError(error);
+  }
 }
 
 const sendEmailVerification = async () => {
-  const auth = getAuth();
+  const auth = getAuth(firebaseApp); // Make sure to get the auth instance
+
   if (auth.currentUser) {
-    await auth.currentUser.sendEmailVerification();
-    alert("Email verification link sent! Please check your email.");
+    try {
+      await auth.currentUser.sendEmailVerification();
+      alert("Email verification link sent! Please check your email.");
+    } catch (error) {
+      console.error("Error sending email verification: ", error);
+      alert("Failed to send verification email. Please try again later.");
+    }
+  } else {
+    console.log("No authenticated user found.");
   }
 }
+
 
 
 // Create new account using email/password
@@ -76,20 +98,13 @@ const createAccount = async () => {
   const password = txtPassword.value
 
 
-
   try {
-    await createUserWithEmailAndPassword(auth, email, password)
-    .then(()=> {
-      sendEmailVerification(auth.currentUser)
-      .then(() => {
-        alert("Email verification link sent!");
-      });
-      alert("Account created Successfuly!")
-    })
-  }
-  catch(error) {
-    console.log(`There was an error: ${error}`)
-    showLoginError(error)
+    await createUserWithEmailAndPassword(auth, email, password);
+    //await sendEmailVerification();
+    alert("Account created successfully! Please verify your email before logging in.");
+  } catch (error) {
+    console.log(`There was an error: ${error}`);
+    showLoginError(error);
   } 
 }
 
@@ -136,6 +151,28 @@ btnLogout.addEventListener("click", logout)
 btnDeleteAccount.addEventListener("click", () => showDeleteConfirmation(deleteAccount));
 
 const auth = getAuth(firebaseApp);
-connectAuthEmulator(auth, "http://localhost:9099");
-
+//connectAuthEmulator(auth, "http://localhost:9099");
 monitorAuthState();
+
+
+//change password
+const changePassword = async () => {
+  const newPass = newPassword.value; // Use the imported UI element
+  
+  try {
+    if (auth.currentUser && newPass) {
+      await updatePassword(auth.currentUser, newPass);
+      alert('Password updated successfully!');
+      hidePasswordChangeForm(); // Hide the form after successful update
+    } else {
+      throw new Error('You must be logged in and enter a new password.');
+    }
+  } catch (error) {
+    console.error('Error updating password:', error);
+    alert('Failed to update password. ' + error.message);
+  }
+};
+
+// Event listener for the change password button
+btnChangePassword.addEventListener('click', changePassword); // Use the imported UI element
+
