@@ -7,116 +7,135 @@ import {
   showLoginError, 
   btnLogin,
   btnSignup,
-  btnLogout
+  btnLogout,
+  showDeleteConfirmation
+  
 } from './ui'
 
-//import and initialize firebase
-//must initialize before calling any service getter function
-//converted npm paths to browser module paths
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from "firebase/analytics";
 
-import { initializeApp, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
 
-//import firebase service
-import {getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js'
 
 import { 
-    getAuth,
-    onAuthStateChanged, 
-    signOut,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    connectAuthEmulator
-  } from 'firebase/auth';
+  getAuth,
+  onAuthStateChanged, 
+  signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  connectAuthEmulator,
+  deleteUser,
   
-//connect to your firebase project
+  //sendEmailVerification
+} from 'firebase/auth';
+
+
+
+
 const firebaseApp = initializeApp({
-  apiKey: "AIzaSyCwp773348dXcI1H2EM1nVRIuGdQN2bmYA",
-  authDomain: "se3316-lab4-authentication.firebaseapp.com",
-  projectId: "se3316-lab4-authentication",
-  storageBucket: "se3316-lab4-authentication.appspot.com",
-  messagingSenderId: "345802742239",
-  appId: "1:345802742239:web:453c08fc597bd3d6cb8c6a",
-  measurementId: "G-43MPPBSF02"
-});
-
-//get functions
-const auth = getAuth(firebaseApp);
-
-
-onAuthStateChanged(auth, user =>{
-    if(user != null){
-        console.log('logged in!');
-    } else{
-        console.log ('No user')
-    }
+  apiKey: "AIzaSyA0K_py-j72t7FufzsJg8af3KsFR6vxmzk",
+  authDomain: "login-ad25a.firebaseapp.com",
+  projectId: "login-ad25a",
+  storageBucket: "login-ad25a.appspot.com",
+  messagingSenderId: "103410718436",
+  appId: "1:103410718436:web:ee01b7e993347f4a413ef1",
+  measurementId: "G-FXMKLXRC9D"
 });
 
 // Login using email/password
 const loginEmailPassword = async () => {
-    const loginEmail = txtEmail.value
-    const loginPassword = txtPassword.value
-  
-    // step 1: try doing this w/o error handling, and then add try/catch
-    await signInWithEmailAndPassword(auth, loginEmail, loginPassword)
-  
-    // step 2: add error handling
-    // try {
-    //   await signInWithEmailAndPassword(auth, loginEmail, loginPassword)
-    // }
-    // catch(error) {
-    //   console.log(`There was an error: ${error}`)
-    //   showLoginError(error)
-    // }
-  }
-  
-  // Create new account using email/password
-  const createAccount = async () => {
-    const email = txtEmail.value
-    const password = txtPassword.value
-  
+  const loginEmail = txtEmail.value
+  const loginPassword = txtPassword.value
+
+  // step 1: try doing this w/o error handling, and then add try/catch
+  //await signInWithEmailAndPassword(auth, loginEmail, loginPassword)
+
+  // step 2: add error handling
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
+      await signInWithEmailAndPassword(auth, loginEmail, loginPassword)
+      console.log(userCredential.user);
     }
     catch(error) {
       console.log(`There was an error: ${error}`)
       showLoginError(error)
-    } 
-  }
+    }
+}
 
-  // Monitor auth state
-const monitorAuthState = async () => {
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        console.log(user)
-        showApp()
-        showLoginState(user)
-  
-        hideLoginError()
-        hideLinkError()
-      }
-      else {
-        showLoginForm()
-        lblAuthState.innerHTML = `You're not logged in.`
-      }
+const sendEmailVerification = async () => {
+  const auth = getAuth();
+  if (auth.currentUser) {
+    await auth.currentUser.sendEmailVerification();
+    alert("Email verification link sent! Please check your email.");
+  }
+}
+
+
+// Create new account using email/password
+const createAccount = async () => {
+  const email = txtEmail.value
+  const password = txtPassword.value
+
+
+
+  try {
+    await createUserWithEmailAndPassword(auth, email, password)
+    .then(()=> {
+      sendEmailVerification(auth.currentUser)
+      .then(() => {
+        alert("Email verification link sent!");
+      });
+      alert("Account created Successfuly!")
     })
   }
-  
-  // Log out
-  const logout = async () => {
-    await signOut(auth);
+  catch(error) {
+    console.log(`There was an error: ${error}`)
+    showLoginError(error)
+  } 
+}
+
+// Monitor auth state
+const monitorAuthState = async () => {
+  onAuthStateChanged(auth, user => {
+    //user signed in
+    if (user) {
+      console.log(user)
+      showApp()
+      showLoginState(user)
+
+      hideLoginError()
+      hideLinkError()
+    }
+    //user signed out
+    else {
+      showLoginForm()
+      lblAuthState.innerHTML = `You're not logged in.`
+    }
+  })
+}
+
+//delete account
+const deleteAccount = async () => {
+  try {
+    await deleteUser(auth.currentUser);
+    alert("Your account has been successfully deleted.");
+    showLoginForm();
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    alert("Failed to delete account. Please try again.");
   }
-  
-  btnLogin.addEventListener("click", loginEmailPassword) 
-  btnSignup.addEventListener("click", createAccount)
-  btnLogout.addEventListener("click", logout)
-  
-  
-  connectAuthEmulator(auth, "http://localhost:9099");
-  
-  monitorAuthState();
-  
+}
 
+// Log out
+const logout = async () => {
+  await signOut(auth);
+}
 
+btnLogin.addEventListener("click", loginEmailPassword) 
+btnSignup.addEventListener("click", createAccount)
+btnLogout.addEventListener("click", logout)
+btnDeleteAccount.addEventListener("click", () => showDeleteConfirmation(deleteAccount));
 
+const auth = getAuth(firebaseApp);
+connectAuthEmulator(auth, "http://localhost:9099");
 
-
+monitorAuthState();

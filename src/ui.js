@@ -13,6 +13,15 @@ export const lblAuthState = document.querySelector('#lblAuthState')
 
 export const divLoginError = document.querySelector('#divLoginError')
 export const lblLoginErrorMessage = document.querySelector('#lblLoginErrorMessage')
+export const btnDeleteAccount = document.querySelector('#btnDeleteAccount');
+
+export const showDeleteConfirmation = (callback) => {
+  const confirmation = window.confirm("Are you sure you want to delete your account? This cannot be undone.");
+  if (confirmation) {
+    callback();
+  }
+}
+
 
 export const showLoginForm = () => {
   login.style.display = 'block'
@@ -40,7 +49,7 @@ export const showLoginError = (error) => {
 }
 
 export const showLoginState = (user) => {
-  lblAuthState.innerHTML = `You're logged in as ${user.displayName} (uid: ${user.uid}, email: ${user.email}) `
+  lblAuthState.innerHTML = `Welcome! You're logged in as ${user.displayName} (uid: ${user.uid}, email: ${user.email}) `
 }
 
 hideLoginError()
