@@ -19,6 +19,15 @@ export const newPassword = document.querySelector('#newPassword');
 export const btnChangePassword = document.querySelector('#btnChangePassword');
 export const introductionElement = document.querySelector('#introduction')
 
+export const btnDeactivateAccount = document.querySelector('#btnDeactivateAccount');
+
+export const showDeactivationConfirmation = (callback) => {
+  const confirmation = window.confirm("Are you sure you want to deactivate your account? You will need to contact admin to reactivate.");
+  if (confirmation) {
+    callback();
+  }
+}
+
 export const hideIntroduction = () => {
   const introductionElement = document.getElementById('introduction');
   if (introductionElement) {

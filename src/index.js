@@ -13,6 +13,8 @@ import {
   btnChangePassword,
   showPasswordChangeForm,
   hidePasswordChangeForm,
+  btnDeactivateAccount,
+  showDeactivationConfirmation
   
 } from './ui'
 
@@ -110,23 +112,30 @@ const createAccount = async () => {
 }
 
 // Monitor auth state
+// index.js
 const monitorAuthState = async () => {
-  onAuthStateChanged(auth, user => {
-    //user signed in
+  onAuthStateChanged(auth, async (user) => {
     if (user) {
-      console.log(user)
-      showApp()
-      showLoginState(user)
-      hideLoginError()
-      hideLinkError()
+      // Get the user's status from the Firestore database
+      const userRef = firestore().collection('users').doc(user.uid);
+      const userDoc = await userRef.get();
+      
+      if (userDoc.exists && userDoc.data().active) {
+        console.log(user);
+        showApp();
+        showLoginState(user);
+        hideLoginError();
+      } else {
+        alert('Your account is deactivated. To reactivate, please contact admin@example.com');
+        signOut(auth);
+      }
+    } else {
+      showLoginForm();
+      lblAuthState.innerHTML = `You're not logged in.`;
     }
-    //user signed out
-    else {
-      showLoginForm()
-      lblAuthState.innerHTML = `You're not logged in.`
-    }
-  })
-}
+  });
+};
+
 
 //delete account
 const deleteAccount = async () => {
@@ -175,4 +184,21 @@ const changePassword = async () => {
 
 // Event listener for the change password button
 btnChangePassword.addEventListener('click', changePassword); // Use the imported UI element
+
+// Function to deactivate the account
+const deactivateAccount = async () => {
+  const userRef = firestore().collection('users').doc(auth.currentUser.uid);
+  
+  try {
+    // Here you update the 'active' field in the user's document to false
+    await userRef.update({ active: false });
+    alert('Your account has been deactivated. To reactivate, please contact admin@example.com');
+    signOut(auth); // Sign out the user after deactivation
+  } catch (error) {
+    console.error('Error deactivating account:', error);
+  }
+};
+
+// Add event listener for the deactivate account button
+btnDeactivateAccount.addEventListener('click', () => showDeactivationConfirmation(deactivateAccount));
 
