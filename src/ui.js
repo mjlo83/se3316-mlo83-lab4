@@ -17,6 +17,22 @@ export const btnDeleteAccount = document.querySelector('#btnDeleteAccount');
 
 export const newPassword = document.querySelector('#newPassword');
 export const btnChangePassword = document.querySelector('#btnChangePassword');
+export const introductionElement = document.querySelector('#introduction')
+
+export const hideIntroduction = () => {
+  const introductionElement = document.getElementById('introduction');
+  if (introductionElement) {
+    introductionElement.style.display = 'none';
+  }
+}
+
+export const showApp = () => {
+  const login = document.getElementById('login');
+  const app = document.getElementById('app');
+  login.style.display = 'none';
+  app.style.display = 'block';
+  hideIntroduction(); // This line will hide the introduction section
+}
 
 export const showPasswordChangeForm = () => {
   const passwordChangeForm = document.querySelector('#passwordChangeForm');
@@ -41,10 +57,6 @@ export const showLoginForm = () => {
   app.style.display = 'none'  
 }
 
-export const showApp = () => {
-  login.style.display = 'none'
-  app.style.display = 'block'
-}
 
 export const hideLoginError = () => {
   divLoginError.style.display = 'none'

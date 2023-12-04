@@ -249,3 +249,23 @@ footer img {
 footer img:hover { opacity: .83; }
 
 footer img:focus , footer a:focus { outline: none; }
+
+
+/* Introduction Styles */
+#introduction h1 {
+	color: #4a89dc; /* Example color */
+	text-align: center;
+	/* ... other styles ... */
+  }
+  
+  #introduction h2 {
+	color: #3160B6; /* Example color */
+	text-align: center;
+	/* ... other styles ... */
+  }
+  
+  #introduction p {
+	text-align: center;
+	/* ... other styles ... */
+  }
+  

@@ -12,7 +12,8 @@ import {
   newPassword,
   btnChangePassword,
   showPasswordChangeForm,
-  hidePasswordChangeForm
+  hidePasswordChangeForm,
+  
 } from './ui'
 
 import { initializeApp } from 'firebase/app';
@@ -116,7 +117,6 @@ const monitorAuthState = async () => {
       console.log(user)
       showApp()
       showLoginState(user)
-
       hideLoginError()
       hideLinkError()
     }
